@@ -397,6 +397,9 @@ void Copter::ten_hz_logging_loop()
     if (should_log(MASK_LOG_CTUN)) {
         attitude_control.control_monitor_log();
     }
+    //if (should_log(MASK_LOG_ADC_SENSOR)) {
+        Log_Write_ADC_Sensor_Messages();
+    //}
 #if FRAME_CONFIG == HELI_FRAME
     Log_Write_Heli();
 #endif

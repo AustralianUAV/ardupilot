@@ -281,6 +281,7 @@ enum ThrowModeState {
 #define LOG_HELI_MSG                    0x20
 #define LOG_PRECLAND_MSG                0x21
 #define LOG_GUIDEDTARGET_MSG            0x22
+#define LOG_ADC_SENSOR_MSG              0x23
 
 #define MASK_LOG_ATTITUDE_FAST          (1<<0)
 #define MASK_LOG_ATTITUDE_MED           (1<<1)
@@ -301,6 +302,7 @@ enum ThrowModeState {
 #define MASK_LOG_MOTBATT                (1UL<<17)
 #define MASK_LOG_IMU_FAST               (1UL<<18)
 #define MASK_LOG_IMU_RAW                (1UL<<19)
+#define MASK_LOG_ADC_SENSOR             (1UL<<20)
 #define MASK_LOG_ANY                    0xFFFF
 
 // DATA - event logging

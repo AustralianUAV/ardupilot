@@ -51,6 +51,7 @@ bool Copter::print_log_menu(void)
         PLOG(COMPASS);
         PLOG(CAMERA);
         PLOG(PID);
+        PLOG(ADC_SENSOR);
 #undef PLOG
     }
 
@@ -133,6 +134,7 @@ int8_t Copter::select_logs(uint8_t argc, const Menu::arg *argv)
         TARG(COMPASS);
         TARG(CAMERA);
         TARG(PID);
+        TARG(ADC_SENSOR);
  #undef TARG
     }
 
@@ -412,6 +414,26 @@ void Copter::Log_Write_MotBatt()
     };
     DataFlash.WriteBlock(&pkt_mot, sizeof(pkt_mot));
 #endif
+}
+
+struct PACKED log_ADC_Sensor {
+    LOG_PACKET_HEADER;
+    uint64_t time_us;
+    float   adc_3v_pin2;
+    float   adc_3v_pin4;
+    float   adc_6v_pin2;
+};
+
+void Copter::Log_Write_ADC_Sensor_Messages()
+{
+    struct log_ADC_Sensor pkt_adc = {
+        LOG_PACKET_HEADER_INIT(LOG_ADC_SENSOR_MSG),
+        time_us         : AP_HAL::micros64(),
+        adc_3v_pin2     : 0.123f, // TEMP!
+        adc_3v_pin4     : 0.456f, // TEMP!
+        adc_6v_pin2     : 0.789f  // TEMP!
+    };
+    DataFlash.WriteBlock(&pkt_adc, sizeof(pkt_adc));
 }
 
 struct PACKED log_Event {
@@ -754,6 +776,8 @@ const struct LogStructure Copter::log_structure[] = {
       "PL",    "QBffffff",    "TimeUS,Heal,bX,bY,eX,eY,pX,pY" },
     { LOG_GUIDEDTARGET_MSG, sizeof(log_GuidedTarget),
       "GUID",  "QBffffff",    "TimeUS,Type,pX,pY,pZ,vX,vY,vZ" },
+    { LOG_ADC_SENSOR_MSG, sizeof(log_ADC_Sensor),
+      "ADC",   "Qfff",    "TimeUS,v1,v2,v3" },
 };
 
 #if CLI_ENABLED == ENABLED
