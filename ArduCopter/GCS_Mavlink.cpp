@@ -418,10 +418,22 @@ void NOINLINE Copter::send_rangefinder(mavlink_channel_t chan)
     if (!rangefinder.has_data()) {
         return;
     }
+
+    // AC: temporarily repurposing the rangefinder telemetry to display gas 
+    // sensor voltages in Mission Planner
+    //mavlink_msg_rangefinder_send(
+    //        chan,
+    //        rangefinder.distance_cm() * 0.01f,
+    //        rangefinder.voltage_mv() * 0.001f);
     mavlink_msg_rangefinder_send(
             chan,
-            rangefinder.distance_cm() * 0.01f,
-            rangefinder.voltage_mv() * 0.001f);
+            rangefinder.voltage_mv(0) * 0.001f,
+            rangefinder.voltage_mv(1) * 0.001f);
+    mavlink_msg_wind_send(
+            chan,
+            rangefinder.voltage_mv(2) * 0.001f,
+            rangefinder.voltage_mv(2) * 0.001f,
+            rangefinder.voltage_mv(2) * 0.001f);
 }
 #endif
 

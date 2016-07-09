@@ -612,7 +612,7 @@ void Copter::read_AHRS(void)
     ahrs.update();
 }
 
-// read baro and rangefinder altitude at 10hz
+// read baro altitude at 10hz
 void Copter::update_altitude()
 {
     // read in baro altitude

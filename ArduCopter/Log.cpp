@@ -429,10 +429,25 @@ void Copter::Log_Write_ADC_Sensor_Messages()
     struct log_ADC_Sensor pkt_adc = {
         LOG_PACKET_HEADER_INIT(LOG_ADC_SENSOR_MSG),
         time_us         : AP_HAL::micros64(),
-        adc_3v_pin2     : 0.123f, // TEMP!
-        adc_3v_pin4     : 0.456f, // TEMP!
-        adc_6v_pin2     : 0.789f  // TEMP!
+        adc_3v_pin2     : -1.0f,
+        adc_3v_pin4     : -1.0f,
+        adc_6v_pin2     : -1.0f
     };
+
+    // AC: this wasn't working for some reason, only when accessing the pins through the 
+    // rangefinder objects, so will go that way for now instead
+    /*static AP_HAL::AnalogSource *source = hal.analogin->channel(ANALOG_INPUT_NONE-1);
+    if (source != NULL) {
+      source->set_pin(14); // temp, hard-coded
+      pkt_adc.adc_3v_pin2 = source->voltage_average();
+      source->set_pin(13); // temp, hard-coded
+      pkt_adc.adc_3v_pin4 = source->voltage_average();
+    }*/
+
+    pkt_adc.adc_3v_pin2 = rangefinder.voltage_mv(0) * 0.001f;
+    pkt_adc.adc_3v_pin4 = rangefinder.voltage_mv(1) * 0.001f;
+    pkt_adc.adc_6v_pin2 = rangefinder.voltage_mv(2) * 0.001f;
+
     DataFlash.WriteBlock(&pkt_adc, sizeof(pkt_adc));
 }
 
