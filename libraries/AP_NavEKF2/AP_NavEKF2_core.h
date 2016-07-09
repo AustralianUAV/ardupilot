@@ -258,6 +258,9 @@ public:
     // this is used by other instances to level load
     uint8_t getFramesSincePredict(void) const;
 
+    // publish output observer angular, velocity and position tracking error
+    void getOutputTrackingError(Vector3f &error) const;
+
 private:
     // Reference to the global EKF frontend for parameters
     NavEKF2 *frontend;
@@ -643,6 +646,8 @@ private:
     bool badMagYaw;                 // boolean true if the magnetometer is declared to be producing bad data
     bool badIMUdata;                // boolean true if the bad IMU data is detected
 
+    const float EKF_TARGET_DT = 0.01f;    // target EKF update time step
+
     float gpsNoiseScaler;           // Used to scale the  GPS measurement noise and consistency gates to compensate for operation with small satellite counts
     Vector28 Kfusion;               // Kalman gain vector
     Matrix24 KH;                    // intermediate result used for covariance updates
@@ -758,8 +763,8 @@ private:
     output_elements outputDataNew;  // output state data at the current time step
     output_elements outputDataDelayed; // output state data at the current time step
     Vector3f delAngCorrection;      // correction applied to delta angles used by output observer to track the EKF
-    Vector3f delVelCorrection;      // correction applied to earth frame delta velocities used by output observer to track the EKF
     Vector3f velCorrection;         // correction applied to velocities used by the output observer to track the EKF
+    Vector3f posCorrection;         // correction applied to positions used by the output observer to track the EKF
     float innovYaw;                 // compass yaw angle innovation (rad)
     uint32_t timeTasReceived_ms;    // time last TAS data was received (msec)
     bool gpsGoodToAlign;            // true when the GPS quality can be used to initialise the navigation system
@@ -787,6 +792,10 @@ private:
     bool startPredictEnabled;       // boolean true when the frontend has given permission to start a new state prediciton cycele
     uint8_t localFilterTimeStep_ms; // average number of msec between filter updates
     float posDownObsNoise;          // observation noise variance on the vertical position used by the state and covariance update step (m^2)
+    Vector3f delAngCorrected;       // corrected IMU delta angle vector at the EKF time horizon (rad)
+    Vector3f delVelCorrected;       // corrected IMU delta velocity vector at the EKF time horizon (m/s)
+
+    Vector3f outputTrackError;
 
     // variables used to calculate a vertical velocity that is kinematically consistent with the verical position
     float posDownDerivative;        // Rate of chage of vertical position (dPosD/dt) in m/s. This is the first time derivative of PosD.

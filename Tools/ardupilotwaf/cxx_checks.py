@@ -124,8 +124,15 @@ def ap_common_checks(cfg):
         mandatory=False,
     )
 
+    cfg.check(header_name='endian.h', mandatory=False)
+
+    cfg.check(header_name='byteswap.h', mandatory=False)
+
 @conf
 def check_librt(cfg, env):
+    if cfg.env.DEST_OS == 'darwin':
+        return True
+
     ret = cfg.check(
         compiler='cxx',
         fragment='''

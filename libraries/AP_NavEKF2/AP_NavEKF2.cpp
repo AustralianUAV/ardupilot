@@ -24,7 +24,7 @@
 #define ACC_P_NSE_DEFAULT       6.0E-01f
 #define GBIAS_P_NSE_DEFAULT     1.0E-04f
 #define GSCALE_P_NSE_DEFAULT    5.0E-04f
-#define ABIAS_P_NSE_DEFAULT     1.0E-03f
+#define ABIAS_P_NSE_DEFAULT     5.0E-03f
 #define MAGB_P_NSE_DEFAULT      5.0E-04f
 #define MAGE_P_NSE_DEFAULT      5.0E-03f
 #define VEL_I_GATE_DEFAULT      500
@@ -49,7 +49,7 @@
 #define ACC_P_NSE_DEFAULT       6.0E-01f
 #define GBIAS_P_NSE_DEFAULT     1.0E-04f
 #define GSCALE_P_NSE_DEFAULT    5.0E-04f
-#define ABIAS_P_NSE_DEFAULT     1.0E-03f
+#define ABIAS_P_NSE_DEFAULT     5.0E-03f
 #define MAGB_P_NSE_DEFAULT      5.0E-04f
 #define MAGE_P_NSE_DEFAULT      5.0E-03f
 #define VEL_I_GATE_DEFAULT      500
@@ -74,7 +74,7 @@
 #define ACC_P_NSE_DEFAULT       6.0E-01f
 #define GBIAS_P_NSE_DEFAULT     1.0E-04f
 #define GSCALE_P_NSE_DEFAULT    5.0E-04f
-#define ABIAS_P_NSE_DEFAULT     1.0E-03f
+#define ABIAS_P_NSE_DEFAULT     5.0E-03f
 #define MAGB_P_NSE_DEFAULT      5.0E-04f
 #define MAGE_P_NSE_DEFAULT      5.0E-03f
 #define VEL_I_GATE_DEFAULT      500
@@ -99,7 +99,7 @@
 #define ACC_P_NSE_DEFAULT       6.0E-01f
 #define GBIAS_P_NSE_DEFAULT     1.0E-04f
 #define GSCALE_P_NSE_DEFAULT    5.0E-04f
-#define ABIAS_P_NSE_DEFAULT     1.0E-03f
+#define ABIAS_P_NSE_DEFAULT     5.0E-03f
 #define MAGB_P_NSE_DEFAULT      5.0E-04f
 #define MAGE_P_NSE_DEFAULT      5.0E-03f
 #define VEL_I_GATE_DEFAULT      500
@@ -454,11 +454,11 @@ const AP_Param::GroupInfo NavEKF2::var_info[] = {
 
     // @Param: TAU_OUTPUT
     // @DisplayName: Output complementary filter time constant (centi-sec)
-    // @Description: Sets the time constant of the output complementary filter/predictor in centi-seconds. Set to a negative number to use a computationally cheaper and less accurate method with an automatically calculated time constant.
-    // @Range: -1 100
-    // @Increment: 10
+    // @Description: Sets the time constant of the output complementary filter/predictor in centi-seconds.
+    // @Range: 10 50
+    // @Increment: 5
     // @User: Advanced
-    AP_GROUPINFO("TAU_OUTPUT", 39, NavEKF2, _tauVelPosOutput, 50),
+    AP_GROUPINFO("TAU_OUTPUT", 39, NavEKF2, _tauVelPosOutput, 25),
 
     // @Param: MAGE_P_NSE
     // @DisplayName: Earth magnetic field process noise (gauss/s)
@@ -475,7 +475,6 @@ const AP_Param::GroupInfo NavEKF2::var_info[] = {
     // @User: Advanced
     // @Units: gauss/s
     AP_GROUPINFO("MAGB_P_NSE", 41, NavEKF2, _magBodyProcessNoise, MAGB_P_NSE_DEFAULT),
-
 
     AP_GROUPEND
 };
@@ -937,6 +936,15 @@ void NavEKF2::getInnovations(int8_t instance, Vector3f &velInnov, Vector3f &posI
     if (instance < 0 || instance >= num_cores) instance = primary;
     if (core) {
         core[instance].getInnovations(velInnov, posInnov, magInnov, tasInnov, yawInnov);
+    }
+}
+
+// publish output observer angular, velocity and position tracking error
+void NavEKF2::getOutputTrackingError(int8_t instance, Vector3f &error) const
+{
+    if (instance < 0 || instance >= num_cores) instance = primary;
+    if (core) {
+        core[instance].getOutputTrackingError(error);
     }
 }
 
