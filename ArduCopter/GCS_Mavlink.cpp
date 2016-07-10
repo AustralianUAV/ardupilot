@@ -425,6 +425,8 @@ void NOINLINE Copter::send_rangefinder(mavlink_channel_t chan)
     //        chan,
     //        rangefinder.distance_cm() * 0.01f,
     //        rangefinder.voltage_mv() * 0.001f);
+
+    // NOTE: this is duplicated here and in Copter::send_adc_sensor() below for now, keep in sync
     mavlink_msg_rangefinder_send(
             chan,
             rangefinder.voltage_mv(0) * 0.001f,
@@ -434,6 +436,9 @@ void NOINLINE Copter::send_rangefinder(mavlink_channel_t chan)
             rangefinder.voltage_mv(2) * 0.001f,
             rangefinder.voltage_mv(2) * 0.001f,
             rangefinder.voltage_mv(2) * 0.001f);
+
+    // TEMP!!! -- testing also sending our custom ADC sensor message from here
+    send_adc_sensor(chan);
 }
 #endif
 
@@ -450,6 +455,15 @@ void NOINLINE Copter::send_rpm(mavlink_channel_t chan)
     }
 }
 
+void NOINLINE Copter::send_adc_sensor(mavlink_channel_t chan)
+{
+    // NOTE: this is duplicated here and in Copter::send_rangefinder() above for now, keep in sync
+    mavlink_msg_adc_send(
+            chan,
+            rangefinder.voltage_mv(0) * 0.001f,
+            rangefinder.voltage_mv(1) * 0.001f,
+            rangefinder.voltage_mv(2) * 0.001f);
+}
 
 /*
   send PID tuning message
@@ -644,6 +658,11 @@ bool GCS_MAVLINK_Copter::try_send_message(enum ap_message id)
     case MSG_RPM:
         CHECK_PAYLOAD_SIZE(RPM);
         copter.send_rpm(chan);
+        break;
+
+    case MSG_ADC_SENSOR:
+        CHECK_PAYLOAD_SIZE(ADC);
+        copter.send_adc_sensor(chan);
         break;
 
     case MSG_TERRAIN:
